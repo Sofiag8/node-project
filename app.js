@@ -1,14 +1,18 @@
 const fs = require('fs')
 const express = require("express")
+const morgan = require("morgan")
 
 const app = express()
 const port = 3000
 
 // middleware
-app.use(express.json())
+app.use(morgan("dev"))
+
 
 const tours = JSON.parse(fs.readFileSync(`${__dirname}/dev-data/data/tours-simple.json`))
-app.get("/api/v1/tours", (request, response) => {
+
+// route handlers
+const getAllTours = (_request, response) => {
     response.status(200).json({
         status: 'success',
         results: tours.length,
@@ -16,9 +20,9 @@ app.get("/api/v1/tours", (request, response) => {
             tours
         }
     })
-})
+}
 
-app.get("/api/v1/tours/:id", (request, response) => {
+const getTourById = (request, response) => {
     const tour = tours.find(el => el.id === Number(request.params.id))
     if (!tour) {
         return response.status(404).json({
@@ -33,9 +37,37 @@ app.get("/api/v1/tours/:id", (request, response) => {
             tour
         }
     })
-})
+}
 
-app.post("/api/v1/tours", (request, response) => {
+const updateTourById =(request, response) => {
+    if (Number(request.params.id) > tours.length) {
+        return response.status(404).json({
+            status: 'failed',
+            message: 'Id could not be found on records'
+        })
+    }
+    response.status(200).json({
+        status: 'success',
+        data: {
+            tour: 'updated tour here'
+        }
+    })
+}
+
+const deleteTour = (request, response) => {
+    if (Number(request.params.id) > tours.length) {
+        return response.status(404).json({
+            status: 'failed',
+            message: 'Id could not be found on records'
+        })
+    }
+    response.status(204).json({
+        status: 'success',
+        data: null
+    })
+}
+
+const createTour = (request, response) => {
 
     const newId = tours[tours.length -1].id  + 1
     const newTour = Object.assign({id: newId}, request.body)
@@ -50,8 +82,20 @@ app.post("/api/v1/tours", (request, response) => {
             }
         })
     })
-})
+}
 
+
+// routes
+app.route('/api/v1/tours')
+.get(getAllTours)
+.post(createTour)
+
+app.route('/api/v1/tours/:id')
+.get(getTourById)
+.patch(updateTourById)
+.delete(deleteTour)
+
+// server
 app.listen(port, ()=> {
     console.log(`App running on port ${port}...`)
 })
