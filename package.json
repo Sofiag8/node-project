@@ -7,7 +7,8 @@
     "test": "jest --forceExit",
     "prepare": "husky install",
     "lint:js": "eslint --ext .js",
-    "test:related": "jest --bail --forceExit"
+    "test:related": "jest --bail --forceExit",
+    "start": "nodemon server.js"
   },
   "repository": {
     "type": "git",
