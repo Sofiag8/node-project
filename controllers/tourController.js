@@ -1,7 +1,29 @@
 const fs = require('fs')
 
 const tours = JSON.parse(fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`))
-const getAllTours = (request, response) => {
+
+
+const checkIdMiddleware = (request, response, next, _value) => {
+    if (Number(request.params.id) > tours.length) {
+        return response.status(404).json({
+            status: 'failed',
+            message: 'Id could not be found on records'
+        })
+    }
+    next()
+}
+
+const checkBodyMiddleware = (request, response, next) => {
+    if (!request.body.name || !request.body.price) {
+        return response.status(404).json({
+            status: 'failed',
+            message: 'Error in body request, missing name or price'
+        })
+    }
+    next()
+}
+
+const getAllTours = (_request, response) => {
     response.status(200).json({
         status: 'success',
         results: tours.length,
@@ -13,12 +35,6 @@ const getAllTours = (request, response) => {
 
 const getTourById = (request, response) => {
     const tour = tours.find(el => el.id === Number(request.params.id))
-    if (!tour) {
-        return response.status(404).json({
-            status: 'failed',
-            message: 'Id could not be found on records'
-        })
-    }
     console.log(tour)
     response.status(200).json({
         status: 'success',
@@ -28,13 +44,7 @@ const getTourById = (request, response) => {
     })
 }
 
-const updateTourById =(request, response) => {
-    if (Number(request.params.id) > tours.length) {
-        return response.status(404).json({
-            status: 'failed',
-            message: 'Id could not be found on records'
-        })
-    }
+const updateTourById =(_request, response) => {
     response.status(200).json({
         status: 'success',
         data: {
@@ -43,13 +53,7 @@ const updateTourById =(request, response) => {
     })
 }
 
-const deleteTour = (request, response) => {
-    if (Number(request.params.id) > tours.length) {
-        return response.status(404).json({
-            status: 'failed',
-            message: 'Id could not be found on records'
-        })
-    }
+const deleteTour = (_request, response) => {
     response.status(204).json({
         status: 'success',
         data: null
@@ -74,6 +78,8 @@ const createTour = (request, response) => {
 }
 
 module.exports = {
+    checkBodyMiddleware,
+    checkIdMiddleware,
     updateTourById,
     getAllTours,
     getTourById,
