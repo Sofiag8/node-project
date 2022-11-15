@@ -14,6 +14,8 @@ app.use((request, response, next) => {
     next()
 })
 
+app.use(express.static(`${__dirname}/public`))
+
 
 // routes
 app.use('/api/v1/tours', tourRouter)
