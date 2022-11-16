@@ -2,12 +2,14 @@ const morgan = require("morgan")
 const express = require("express")
 const tourRouter = require('./routes/tourRoutes')
 const userRouter = require('./routes/userRoutes')
-const { nextTick } = require("process")
+const config = require('./config/index')
 
 const app = express()
 
 // middleware
-app.use(morgan("dev"))
+if (config.env === 'development') {
+    app.use(morgan("dev"))
+}
 app.use(express.json())
 app.use((request, response, next) => {
     response.requestTime = new Date().toDateString()
