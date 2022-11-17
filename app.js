@@ -5,7 +5,6 @@ const userRouter = require('./routes/userRoutes');
 const config = require('./config/index');
 
 const app = express();
-
 // middleware
 if (config.env === 'development') {
   app.use(morgan('dev'));
