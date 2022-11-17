@@ -8,8 +8,14 @@ dotenv.config({path: './.env'})
       enabled: process.env.BOOLEAN ? process.env.BOOLEAN.toLowerCase() === 'true' : false
     },
     server: {
-      port: Number(process.env.PORT)
+      port: process.env.PORT
+    },
+    database: {
+      dbUsername: process.env.DB_USERNAME,
+      dbPassword: process.env.DB_PASSWORD,
+      dbHost: process.env.DB_HOST
     }
+
   }
   
   module.exports = config
