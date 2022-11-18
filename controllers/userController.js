@@ -1,77 +1,89 @@
+const UserModel = require('./../models/userModel')
 
-const fs = require('fs')
-
-const users = JSON.parse(fs.readFileSync(`${__dirname}/../dev-data/data/users.json`))
-
-const getAllUsers = (_request, response) => {
-    response.status(200).json({
-        status: 'success',
-        results: users.length,
-        data: {
-            users
-        }
-    })
+const getAllUsers = async (_request, response) => {
+    try {
+        const allUsers = await UserModel.find()
+        response.status(200).json({
+            status: 'success',
+            results: allUsers.length,
+            data: {
+                allUsers
+            }
+        })
+    } catch (error) {
+        response.status(404).json({
+            status: 'failed',
+            message: `An error ocurred trying to find all users ${error}`
+        })
+    }
 }
 
-const createUser = (request, response) => {
-
-    const newId = users[users.length -1].id  + 1
-    const newUser = Object.assign({id: newId}, request.body)
-
-    users.push(newUser)
-
-    fs.writeFile(`${__dirname}/dev-data/data/users.json`, JSON.stringify(users), err => {
+const createUser = async (request, response) => {
+    try {
+        const createdUser = await UserModel.create(request.body)
         response.status(201).json({
             status: 'success',
             data: {
-                user: newUser
+                tour: createdUser
             }
         })
-    })
-}
-
-const deleteUser = (request, response) => {
-    if (Number(request.params.id) > users.length) {
-        return response.status(404).json({
+    } catch (error) {
+        response.status(400).json({
             status: 'failed',
-            message: 'Id could not be found on records'
+            message: `An error ocurred trying to create a new user record ${error}`
         })
     }
-    response.status(204).json({
-        status: 'success',
-        data: null
-    })
 }
 
-const updateUserById =(request, response) => {
-    if (Number(request.params.id) > users.length) {
-        return response.status(404).json({
-            status: 'failed',
-            message: 'Id could not be found on records'
+const deleteUser = async (request, response) => {
+    try {
+        const deletedUser = await UserModel.findByIdAndDelete(request.params.id)
+        response.status(204).json({
+            status: 'success',
+            data: deletedUser
         })
-    }
-    response.status(200).json({
-        status: 'success',
-        data: {
-            user: 'updated tour here'
-        }
-    })
+      } catch (error) {
+        response.status(404).json({
+            status: 'failed',
+            message: `An error ocurred trying to delete an user ${error}`
+        })
+      }
 }
 
-const getUserById = (request, response) => {
-    const user = users.find(el => el._id === request.params.id)
-    if (!user) {
-        return response.status(404).json({
+const updateUserById =async (request, response) => {
+    try {
+        const updatedUser = await UserModel.findByIdAndUpdate(request.params.id, request.body, {
+        new : true
+        })
+        response.status(200).json({
+            status: 'success',
+            data: {
+                tour: updatedUser
+            }
+        })
+    } catch (error) {
+        response.status(404).json({
             status: 'failed',
-            message: 'Id could not be found on records'
+            message: `An error ocurred trying to update an user by Id ${error}`
         })
     }
-    response.status(200).json({
-        status: 'success',
-        data: {
-            user
-        }
-    })
+}
+
+const getUserById = async (request, response) => {
+    try {
+        const user = await UserModel.findById(request.params.id)
+        response.status(200).json({
+            status: 'success',
+            data: {
+                user
+            }
+        })
+    } catch (error) {
+        response.status(404).json({
+            status: 'failed',
+            message: `An error ocurred trying to find an user by Id ${error}`
+        })
+    }
 }
 
 module.exports = {
