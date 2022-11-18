@@ -1,85 +1,92 @@
-const fs = require('fs')
+const TourModel = require('./../models/tourModel')
 
-const tours = JSON.parse(fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`))
-
-
-const checkIdMiddleware = (request, response, next, _value) => {
-    if (Number(request.params.id) > tours.length) {
-        return response.status(404).json({
-            status: 'failed',
-            message: 'Id could not be found on records'
-        })
-    }
-    next()
-}
-
-const checkBodyMiddleware = (request, response, next) => {
-    if (!request.body.name || !request.body.price) {
-        return response.status(404).json({
-            status: 'failed',
-            message: 'Error in body request, missing name or price'
-        })
-    }
-    next()
-}
-
-const getAllTours = (_request, response) => {
-    response.status(200).json({
-        status: 'success',
-        results: tours.length,
-        data: {
-            tours
-        }
-    })
-}
-
-const getTourById = (request, response) => {
-    const tour = tours.find(el => el.id === Number(request.params.id))
-    console.log(tour)
-    response.status(200).json({
-        status: 'success',
-        data: {
-            tour
-        }
-    })
-}
-
-const updateTourById =(_request, response) => {
-    response.status(200).json({
-        status: 'success',
-        data: {
-            tour: 'updated tour here'
-        }
-    })
-}
-
-const deleteTour = (_request, response) => {
-    response.status(204).json({
-        status: 'success',
-        data: null
-    })
-}
-
-const createTour = (request, response) => {
-
-    const newId = tours[tours.length -1].id  + 1
-    const newTour = Object.assign({id: newId}, request.body)
-
-    tours.push(newTour)
-
-    fs.writeFile(`${__dirname}/dev-data/data/tours-simple.json`, JSON.stringify(tours), err => {
-        response.status(201).json({
+const getAllTours = async(request, response) => {
+    try {
+        const allTours = await TourModel.find()
+        response.status(200).json({
             status: 'success',
+            results: allTours.length,
             data: {
-                tour:newTour
+                allTours
             }
         })
+    } catch (error) {
+        response.status(404).json({
+            status: 'failed',
+            message: `An error ocurred trying to find all tours ${error}`
+        })
+    }
+}
+
+const getTourById = async (request, response) => {
+    try {
+        const tour = await TourModel.findById(request.params.id)
+        response.status(200).json({
+            status: 'success',
+            data: {
+                tour
+            }
+        })
+    } catch (error) {
+        response.status(404).json({
+            status: 'failed',
+            message: `An error ocurred trying to find a tour by Id ${error}`
+        })
+    }
+}
+
+const updateTourById = async (request, response) => {
+    try {
+        const updatedTour = await TourModel.findByIdAndUpdate(request.params.id, request.body, {
+            new : true
+        })
+        response.status(200).json({
+            status: 'success',
+            data: {
+                tour: updatedTour
+            }
+        })
+    } catch (error) {
+        response.status(404).json({
+            status: 'failed',
+            message: `An error ocurred trying to update a tour by Id ${error}`
+        })
+    }
+}
+
+const deleteTour = async (request, response) => {
+  try {
+    const deletedTour = await TourModel.findByIdAndDelete(request.params.id)
+    response.status(204).json({
+        status: 'success',
+        data: deletedTour
     })
+  } catch (error) {
+    response.status(404).json({
+        status: 'failed',
+        message: `An error ocurred trying to delete a tour ${error}`
+    })
+  }
+}
+
+const createTour = async (request, response) => {
+    try {
+            const createdTour = await TourModel.create(request.body)
+            response.status(201).json({
+                status: 'success',
+                data: {
+                    tour: createdTour
+                }
+            })
+    } catch (error) {
+        response.status(400).json({
+            status: 'failed',
+            message: `An error ocurred trying to create a new tour record ${error}`
+        })
+    }
 }
 
 module.exports = {
-    checkBodyMiddleware,
-    checkIdMiddleware,
     updateTourById,
     getAllTours,
     getTourById,
