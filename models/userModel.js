@@ -2,29 +2,29 @@ const mongoose = require('mongoose')
 
 const userSchema = new mongoose.Schema({
   name: {
-      type: String,
-      required: [true, 'An user must have a name'],
-      unique: true
+    type: String,
+    required: [true, 'An user must have a name'],
+    unique: true,
   },
   email: {
     type: String,
     required: [true, 'An user must have an unique email'],
-    unique: true
+    unique: true,
   },
   role: {
-    type: String
+    type: String,
   },
   active: {
     type: Boolean,
-    default: true
+    default: true,
   },
   photo: {
-    type: String
+    type: String,
   },
   password: {
     type: String,
-    required: [true, 'Password is required']
-  }
+    required: [true, 'Password is required'],
+  },
 })
 
 const User = mongoose.model('User', userSchema)

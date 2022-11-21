@@ -1,32 +1,32 @@
-const morgan = require('morgan');
-const express = require('express');
-const tourRouter = require('./routes/tourRoutes');
-const userRouter = require('./routes/userRoutes');
-const config = require('./config/index');
+const morgan = require('morgan')
+const express = require('express')
+const tourRouter = require('./routes/tourRoutes')
+const userRouter = require('./routes/userRoutes')
+const config = require('./config/index')
 
-const app = express();
+const app = express()
 // middleware
 if (config.env === 'development') {
-  app.use(morgan('dev'));
+  app.use(morgan('dev'))
 }
-app.use(express.json());
+app.use(express.json())
 app.use((request, response, next) => {
-  response.requestTime = new Date().toDateString();
-  next();
-});
+  response.requestTime = new Date().toDateString()
+  next()
+})
 
-app.use(express.static(`${__dirname}/public`));
+app.use(express.static(`${__dirname}/public`))
 
 // routes
-app.use('/api/v1/tours', tourRouter);
-app.use('/api/v1/users', userRouter);
+app.use('/api/v1/tours', tourRouter)
+app.use('/api/v1/users', userRouter)
 
 // unhandled routes middleware
 app.all('*', (request, response, next) => {
   response.status(404).json({
     status: 'failed',
-    message: `Cant find ${request.originalUrl} on this server!`
+    message: `Cant find ${request.originalUrl} on this server!`,
   })
 })
 
-module.exports = app;
+module.exports = app
