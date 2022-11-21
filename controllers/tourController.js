@@ -97,7 +97,6 @@ const createTour = async (request, response) => {
 const getMonthlyPlan = async (request, response) => {
     try {
         const {year} = request.params
-        console.log(year)
 
         const plan = await TourModel.aggregate([
             {
