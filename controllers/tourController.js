@@ -1,8 +1,14 @@
 const TourModel = require('./../models/tourModel')
 
-const getAllTours = async(request, response) => {
+const getAllTours = async (request, response) => {
     try {
-        const allTours = await TourModel.find()
+        const queryObj = {...request.query}
+
+        let queryString = JSON.stringify(queryObj)
+        queryString = queryString.replace(/\b(gte|gt|lte|lt)\b/g, match => `$${match}`)
+        
+        let allTours =  await TourModel.find(JSON.parse(queryString))
+
         response.status(200).json({
             status: 'success',
             results: allTours.length,
@@ -11,6 +17,7 @@ const getAllTours = async(request, response) => {
             }
         })
     } catch (error) {
+        console.log(error)
         response.status(404).json({
             status: 'failed',
             message: `An error ocurred trying to find all tours ${error}`
