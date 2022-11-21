@@ -45,6 +45,7 @@ const getTourById = async (request, response) => {
 const updateTourById = async (request, response) => {
     try {
         const updatedTour = await TourModel.findByIdAndUpdate(request.params.id, request.body, {
+            runValidators: true,
             new : true
         })
         response.status(200).json({
