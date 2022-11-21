@@ -93,8 +93,71 @@ const createTour = async (request, response) => {
     }
 }
 
+// aggregated pipeline
+const getMonthlyPlan = async (request, response) => {
+    try {
+        const {year} = request.params
+        console.log(year)
+
+        const plan = await TourModel.aggregate([
+            {
+                // breaks nested documents into simple documents according to an specific field
+                $unwind: '$startDates'
+            },
+            {
+                $match: {
+                    startDates: {
+                        $gte: new Date(`${year}-01-01`),
+                        $lte: new Date(`${year}-12-31`)
+                    }
+                }
+            },
+            {            
+                $group: {
+                    _id: {
+                        $month: '$startDates'
+                    },
+                    numTourStarts: {$sum: 1},
+                    // push to create an array with specific field
+                    tours: { $push: '$name'}
+                }
+            },
+            {
+                $addFields: {
+                    month: '$_id'
+                }
+            },
+            {
+                // project specify the inclution or not of a field 
+                $project: {
+                    // _id is not shown anymore
+                    _id: 0
+                }
+            },
+            {
+                $sort: {
+                    numTourStarts: -1
+                }
+            }
+        ])
+
+        response.status(200).json({
+            status: 'success',
+            data: {
+                plan
+            }
+        })
+    } catch (error) {
+        response.status(400).json({
+            status: 'failed',
+            message: `An error ocurred trying to get monthly plan ${error}`
+        })   
+    }
+}
+
 module.exports = {
     updateTourById,
+    getMonthlyPlan,
     getAllTours,
     getTourById,
     deleteTour,

@@ -1,11 +1,14 @@
 const express = require('express')
-const {getAllTours, createTour, getTourById, deleteTour, updateTourById} = require('../controllers/tourController')
+const {getAllTours, createTour, getTourById, deleteTour, updateTourById, getMonthlyPlan} = require('../controllers/tourController')
 
 const router = express.Router();
 
 router.route('/')
 .get(getAllTours)
 .post(createTour)
+
+router.route('/monthly-plan/:year')
+.get(getMonthlyPlan)
 
 router.route('/:id')
 .get(getTourById)
