@@ -1,8 +1,8 @@
 const morgan = require('morgan')
 const express = require('express')
+const config = require('../config')
 const tourRouter = require('./routes/tourRoutes')
 const userRouter = require('./routes/userRoutes')
-const config = require('./config/index')
 
 const app = express()
 // middleware

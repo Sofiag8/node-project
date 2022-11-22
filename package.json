@@ -8,7 +8,7 @@
     "prepare": "husky install",
     "lint:js": "eslint --ext .js",
     "test:related": "jest --bail --forceExit",
-    "start": "nodemon server.js",
+    "start": "nodemon ./src/server.js",
     "start:prod": "NODE_ENV=production nodemon server.js",
     "debug": "ndb server.js"
   },
