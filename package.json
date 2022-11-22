@@ -9,7 +9,7 @@
     "lint:js": "eslint --ext .js",
     "test:related": "jest --bail --forceExit",
     "start:dev": "nodemon ./src/server.js",
-    "start:prod": "NODE_ENV=production nodemon ./src/server.js",
+    "start:prod": "NODE_ENV=production ./src/server.js",
     "debug": "ndb server.js"
   },
   "repository": {
