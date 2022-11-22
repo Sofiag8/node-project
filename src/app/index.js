@@ -1,8 +1,10 @@
 const morgan = require('morgan')
 const express = require('express')
 const config = require('../config')
+const appError = require('../utils/appError')
 const tourRouter = require('./routes/tourRoutes')
 const userRouter = require('./routes/userRoutes')
+const errorController = require('../controllers/errorController')
 
 const app = express()
 // middleware
@@ -23,10 +25,9 @@ app.use('/api/v1/users', userRouter)
 
 // unhandled routes middleware
 app.all('*', (request, response, next) => {
-  response.status(404).json({
-    status: 'failed',
-    message: `Cant find ${request.originalUrl} on this server!`,
-  })
+  next(new appError(`Cant find ${request.originalUrl} on this server!`, 404))
 })
+
+app.use(errorController)
 
 module.exports = app
