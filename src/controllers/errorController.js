@@ -17,6 +17,12 @@ const handleValidationErrorDb = (error) => {
   return new AppError(message, 400)
 }
 
+const handleJsonWebTokenError = () =>
+  new AppError('Invalid token. Please log in again', 404)
+
+const handleTokenExpiredError = () =>
+  new AppError('Expired token. Please log in again', 404)
+
 const switchErrorCases = ({ errorCase, err }) => {
   switch (errorCase) {
     case errors.castError:
@@ -25,6 +31,10 @@ const switchErrorCases = ({ errorCase, err }) => {
       return (err = handleDuplicatedErrorDb(err))
     case errors.validationError:
       return (err = handleValidationErrorDb(err))
+    case errors.jsonWebTokenError:
+      return (err = handleJsonWebTokenError())
+    case errors.tokenExpiredError:
+      return (err = handleTokenExpiredError())
   }
 }
 

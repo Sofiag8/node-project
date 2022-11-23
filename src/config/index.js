@@ -1,7 +1,6 @@
 const dotenv = require('dotenv')
 dotenv.config({ path: `${__dirname}/../../.env` })
 
-console.log('process ', process.env.NODE_ENV)
 const config = {
   env: process.env.NODE_ENV,
   logger: {
@@ -18,6 +17,8 @@ const config = {
     dbPassword: process.env.DB_PASSWORD,
     dbHost: process.env.DB_HOST,
   },
+  jwtKey: process.env.JWT_KEY,
+  jwtExpiration: process.env.JWT_EXPIRATION,
 }
 
 module.exports = config

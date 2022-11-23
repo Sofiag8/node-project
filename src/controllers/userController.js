@@ -13,16 +13,6 @@ const getAllUsers = catchAsync(async (_request, response, next) => {
   })
 })
 
-const createUser = catchAsync(async (request, response, next) => {
-  const createdUser = await UserModel.create(request.body)
-  response.status(201).json({
-    status: 'success',
-    data: {
-      tour: createdUser,
-    },
-  })
-})
-
 const deleteUser = catchAsync(async (request, response, next) => {
   const deletedUser = await UserModel.findByIdAndDelete(request.params.id)
 
@@ -53,6 +43,16 @@ const updateUserById = catchAsync(async (request, response, next) => {
     status: 'success',
     data: {
       tour: updatedUser,
+    },
+  })
+})
+
+const createUser = catchAsync(async (request, response, next) => {
+  const createdUser = await UserModel.create(request.body)
+  response.status(201).json({
+    status: 'success',
+    data: {
+      tour: createdUser,
     },
   })
 })

@@ -7,8 +7,12 @@ const {
   getUserById,
   updateUserById,
 } = require('../../controllers/userController')
+const { signup, login } = require('../../controllers/authController')
 
-router.route('/').get(getAllUsers).post(createUser)
+router.route('/').get(getAllUsers)
+
+router.post('/signup', signup)
+router.post('/login', login)
 
 router.route('/:id').get(getUserById).patch(updateUserById).delete(deleteUser)
 
