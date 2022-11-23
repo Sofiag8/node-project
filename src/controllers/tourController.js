@@ -2,22 +2,27 @@ const AppError = require('../utils/appError')
 const TourModel = require('../models/tourModel')
 const catchAsync = require('../utils/catchAsync')
 
-const getAllTours = catchAsync(async (request, response, next) => {
-  const queryObj = { ...request.query }
-
-  let queryString = JSON.stringify(queryObj)
-  queryString = queryString.replace(
+const parseQueryString = (queryStringObject) => {
+  const rawQueryString = JSON.stringify(queryStringObject)
+  const queryString = rawQueryString.replace(
     /\b(gte|gt|lte|lt)\b/g,
     (match) => `$${match}`
   )
 
-  let allTours = await TourModel.find(JSON.parse(queryString))
+  return JSON.parse(queryString)
+}
+
+const getAllTours = catchAsync(async (request, response, next) => {
+  const queryStringObject = { ...request.query }
+  const parsedQueryString = parseQueryString(queryStringObject)
+
+  const tourList = await TourModel.find(parsedQueryString)
 
   response.status(200).json({
     status: 'success',
-    results: allTours.length,
+    total: tourList.length,
     data: {
-      allTours,
+      tourList,
     },
   })
 })
