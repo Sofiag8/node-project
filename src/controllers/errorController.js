@@ -5,9 +5,9 @@ const errorController = (error, request, response, next) => {
   error.status = error.status || 'error'
 
   if (process.env.NODE_ENV === 'development') {
-    developmentError(error, response)
+    return developmentError(error, response)
   } else if (process.env.NODE_ENV === 'production') {
-    productionError(error, response)
+    return productionError(error, response)
   }
 }
 
