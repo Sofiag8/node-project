@@ -38,6 +38,9 @@ const login = catchAsync(async (request, response, next) => {
   }
 
   const token = generateJwt(user._id)
+  request.user = user
+
+  console.log(request)
 
   response.status(201).json({
     status: 'success',
@@ -154,9 +157,34 @@ const resetPassword = catchAsync(async (request, response, next) => {
   })
 })
 
+const updatePassword = catchAsync(async (request, response, next) => {
+  const user = await UserModel.findById(request.user._id).select('+password')
+  if (!user) {
+    return next(new AppError('User not found', 404))
+  }
+
+  if (
+    !(await user.isValidPassword(request.body.currentPassword, user.password))
+  ) {
+    return next(new AppError('Current password is not correct', 404))
+  }
+
+  user.password = request.body.password
+  user.passwordConfirm = request.body.confimPassword
+  await user.save()
+
+  const token = generateJwt(user._id)
+
+  response.status(201).json({
+    status: 'success',
+    token,
+  })
+})
+
 module.exports = {
   isAuthenticated,
   forgotPassword,
+  updatePassword,
   resetPassword,
   isAuthorized,
   signup,
