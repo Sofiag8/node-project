@@ -1,5 +1,10 @@
 const morgan = require('morgan')
 const express = require('express')
+const rateLimit = require('express-rate-limit')
+const helmet = require('helmet')
+const mongoSanitize = require('express-mongo-sanitize')
+const hpp = require('hpp')
+const xss = require('xss-clean')
 const config = require('../config')
 const appError = require('../utils/appError')
 const tourRouter = require('./routes/tourRoutes')
@@ -7,16 +12,53 @@ const userRouter = require('./routes/userRoutes')
 const errorController = require('../controllers/errorController')
 
 const app = express()
-// middleware
+
+// Security http headers
+app.use(helmet())
+
+// Development loggin
 if (config.env === 'development') {
   app.use(morgan('dev'))
 }
-app.use(express.json())
+
+// Limit requests
+const limiter = rateLimit({
+  max: 100,
+  windowMs: 60 * 60 * 1000,
+  message: 'Too many requests from this IP, please try again in an hour',
+})
+app.use('/api', limiter)
+
+// Body parser, reading data from body into req.body
+app.use(express.json({ limit: '10kb' }))
+
+// Data sanitization against NoSQL query injection
+app.use(mongoSanitize())
+
+// Data sanitization against cross site attacks
+app.use(xss())
+
+// Prevent parameter polution
+app.use(
+  hpp({
+    whitelist: [
+      'ratingsQuantity',
+      'ratingsAverage',
+      'maxGroupSize',
+      'difficulty',
+      'duration',
+      'price',
+    ],
+  })
+)
+
+// Middleware test
 app.use((request, response, next) => {
   response.requestTime = new Date().toDateString()
   next()
 })
 
+// Serving static files
 app.use(express.static(`${__dirname}/public`))
 
 // routes
