@@ -1,5 +1,6 @@
 const morgan = require('morgan')
 const express = require('express')
+const path = require('path')
 const rateLimit = require('express-rate-limit')
 const helmet = require('helmet')
 const mongoSanitize = require('express-mongo-sanitize')
@@ -9,12 +10,19 @@ const config = require('../config')
 const appError = require('../utils/appError')
 const tourRouter = require('./routes/tourRoutes')
 const userRouter = require('./routes/userRoutes')
+const viewRouter = require('./routes/viewRoutes')
 const errorController = require('../controllers/errorController')
 
 const app = express()
 
+app.set('view engine', 'pug')
+app.set('views', __dirname + './../views')
+
+// Serving static files
+app.use(express.static(__dirname + './../public'))
+
 // Security http headers
-app.use(helmet())
+// app.use(helmet()) -- uncomment after server side renderig
 
 // Development loggin
 if (config.env === 'development') {
@@ -58,10 +66,9 @@ app.use((request, response, next) => {
   next()
 })
 
-// Serving static files
-app.use(express.static(`${__dirname}/public`))
-
 // routes
+app.use('/', viewRouter)
+
 app.use('/api/v1/tours', tourRouter)
 app.use('/api/v1/users', userRouter)
 
