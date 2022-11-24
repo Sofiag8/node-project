@@ -19,6 +19,10 @@ const config = {
   },
   jwtKey: process.env.JWT_KEY,
   jwtExpiration: process.env.JWT_EXPIRATION,
+  emailUser: process.env.EMAIL_USER,
+  emailPassword: process.env.EMAIL_PASSWORD,
+  emailHost: process.env.EMAIL_HOST,
+  emailPort: process.env.EMAIL_PORT,
 }
 
 module.exports = config
