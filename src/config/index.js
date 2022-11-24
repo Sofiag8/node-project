@@ -24,6 +24,7 @@ const config = {
   emailPassword: process.env.EMAIL_PASSWORD,
   emailHost: process.env.EMAIL_HOST,
   emailPort: process.env.EMAIL_PORT,
+  emailSender: process.env.EMAIL_SENDER,
 }
 
 module.exports = config

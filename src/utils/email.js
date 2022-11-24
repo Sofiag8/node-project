@@ -12,7 +12,7 @@ const sendEmail = async (options) => {
   })
 
   await transporter.sendMail({
-    from: 'Sofia <sofia@jonas.io>',
+    from: `${config.emailSender}`,
     to: options.email,
     subject: options.subject,
     text: options.message,
