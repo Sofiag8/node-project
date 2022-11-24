@@ -9,6 +9,28 @@ const jwt = require('jsonwebtoken')
 const config = require('../config')
 const User = require('../models/userModel')
 
+const createSendToken = (user, statusCode, response) => {
+  const token = generateJwt(user._id)
+
+  const cookieOptions = {
+    expires: new Date(
+      Date.now() + config.jwtCookieExpiresIn * 24 * 60 * 60 * 1000
+    ),
+    httpOnly: true,
+  }
+
+  if (process.env.NODE_ENV === 'production') cookieOptions.secure = true
+  response.cookie('jwt', token, cookieOptions)
+
+  // no password in output
+  user.password = undefined
+  response.status(statusCode).json({
+    status: 'success',
+    token,
+    user,
+  })
+}
+
 const signup = catchAsync(async (request, response, next) => {
   const createdUser = await UserModel.create({
     name: request.body.name,
@@ -17,13 +39,7 @@ const signup = catchAsync(async (request, response, next) => {
     password: request.body.password,
     passwordConfirm: request.body.passwordConfirm,
   })
-  const token = generateJwt(createdUser._id)
-
-  response.status(201).json({
-    status: 'success',
-    user: createdUser,
-    token,
-  })
+  createSendToken(createdUser, 201, response)
 })
 
 const login = catchAsync(async (request, response, next) => {
@@ -36,16 +52,9 @@ const login = catchAsync(async (request, response, next) => {
   if (!user || !(await user.isValidPassword(password, user.password))) {
     return next(new AppError('Incorrect email or password', 401))
   }
-
-  const token = generateJwt(user._id)
   request.user = user
 
-  console.log(request)
-
-  response.status(201).json({
-    status: 'success',
-    token,
-  })
+  createSendToken(user, 201, response)
 })
 
 // middleware function to tour routes
@@ -149,12 +158,7 @@ const resetPassword = catchAsync(async (request, response, next) => {
   user.passwordResetExpires = undefined
   await user.save()
 
-  const token = generateJwt(user._id)
-
-  response.status(201).json({
-    status: 'success',
-    token,
-  })
+  createSendToken(user, 201, response)
 })
 
 const updatePassword = catchAsync(async (request, response, next) => {
@@ -173,12 +177,7 @@ const updatePassword = catchAsync(async (request, response, next) => {
   user.passwordConfirm = request.body.confimPassword
   await user.save()
 
-  const token = generateJwt(user._id)
-
-  response.status(201).json({
-    status: 'success',
-    token,
-  })
+  createSendToken(user, 201, response)
 })
 
 module.exports = {
