@@ -1,2 +1,3 @@
 # node-project
-real-world RESTful API and web app (with authentication, Node.js security, payments &amp; more)
+
+## Udemy course from begginer to expert, real-world RESTful API with authentication and security.
